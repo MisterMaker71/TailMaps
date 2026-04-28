@@ -30,6 +30,12 @@ let activeButtons = new Map();
 let pathEnabled = false;
 const pathColor = [254, 254, 254];
 
+const zoomDisplay = document.getElementById("zoomDisplay");
+
+function updateZoomDisplay() {
+    if (!zoomDisplay) return;
+    zoomDisplay.textContent = "Zoom: " + Math.round(scale * 100) + "%";
+}
 // ==========================
 // LOAD
 // ==========================
@@ -63,6 +69,7 @@ Promise.all([
     overlayData = c2.getImageData(0, 0, t2.width, t2.height);
 
     fitToScreen();
+	updateZoomDisplay();
 });
 
 // ==========================
@@ -116,6 +123,8 @@ function redraw(imageData = currentImageData) {
 
     tctx.putImageData(imageData, 0, 0);
     ctx.drawImage(temp, 0, 0);
+	
+	updateZoomDisplay();
 }
 
 // ==========================
@@ -146,8 +155,8 @@ function redrawLayers() {
         // path on top
         if (pathEnabled && matchColor(r, g, b, pathColor)) {
             result[i] = 255;
-            result[i + 1] = 255;
-            result[i + 2] = 0; // yellow
+            result[i + 1] = 127;
+            result[i + 2] = 0;
         }
     }
 
@@ -166,16 +175,14 @@ function toggleColor(color, button) {
         activeColors[0][1] === color[1] &&
         activeColors[0][2] === color[2];
 
-    // reset all buttons first
-    document.querySelectorAll(".controls button").forEach(b => {
+    // reset ONLY region buttons
+    document.querySelectorAll(".region-btn").forEach(b => {
         b.style.background = "";
     });
 
     if (isSameActive) {
-        // turn OFF
         activeColors = [];
     } else {
-        // turn ON only this one
         activeColors = [color];
         button.style.background = "#550000";
     }
@@ -215,14 +222,12 @@ function matchColor(r, g, b, t) {
 function resetMap() {
     activeColors = [];
 
-    // reset ONLY region buttons (not the path button)
-    document.querySelectorAll(".controls button").forEach(b => {
-        if (!b.classList.contains("path-btn")) {
-            b.style.background = "";
-        }
+    // reset only region buttons
+    document.querySelectorAll(".region-btn").forEach(b => {
+        b.style.background = "";
     });
 
-    redrawLayers(); // keep path state
+    redrawLayers(); // keeps path state
 }
 
 // ==========================
@@ -281,4 +286,5 @@ canvas.addEventListener("wheel", e => {
 window.addEventListener("resize", () => {
     resizeCanvas();
     fitToScreen();
+	updateZoomDisplay();
 });
