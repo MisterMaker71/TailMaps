@@ -29,25 +29,30 @@ let lastX = 0;
 let lastY = 0;
 
 
-function fitToScreen() {
-    const container = canvas.parentElement;
+function fitToScreen() {function fitToScreen() {
+    const viewWidth = canvas.width;
+    const viewHeight = canvas.height;
 
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
+    const scaleX = viewWidth / mapImg.width;
+    const scaleY = viewHeight / mapImg.height;
 
-    const scaleX = containerWidth / canvas.width;
-    const scaleY = containerHeight / canvas.height;
-
-    // pick smaller → keep aspect ratio
     scale = Math.min(scaleX, scaleY);
 
-    // center it
-    offsetX = (containerWidth - canvas.width * scale) / 2;
-    offsetY = (containerHeight - canvas.height * scale) / 2;
+    offsetX = (viewWidth - mapImg.width * scale) / 2;
+    offsetY = (viewHeight - mapImg.height * scale) / 2;
 
     redraw();
 	
 	console.log("fit to screen");
+}
+
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    redraw();
 }
 
 
@@ -74,11 +79,13 @@ Promise.all([
     tempCtx.drawImage(overlayImg, 0, 0);
     overlayData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
 	
+	resizeCanvas();
 	fitToScreen();
 });
 
 window.addEventListener("resize", () => {
-    fitToScreen();
+    resizeCanvas();
+	fitToScreen();
 });
 
 // redraw
