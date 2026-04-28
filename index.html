@@ -27,10 +27,10 @@
 
 <h2>Map Highlighter</h2>
 
-<div>
-    <button onclick="highlight([255,0,0])">Red Area</button>
-    <button onclick="highlight([0,255,0])">Green Area</button>
-    <button onclick="highlight([0,0,255])">Blue Area</button>
+<div><button onclick="highlightOverlay([255,0,255])">Pink Region</button>
+	<button onclick="highlightOverlay([255,255,0])">Yellow Region</button>
+	<button onclick="highlightOverlay([0,255,0])">Green Region</button>
+	<button onclick="resetMap()">Reset</button>
 </div>
 
 <canvas id="canvas"></canvas>
