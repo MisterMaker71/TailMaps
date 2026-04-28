@@ -1,6 +1,10 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+
+const zoomDisplay = document.getElementById("zoomDisplay");
+
+
 // disable blur
 ctx.imageSmoothingEnabled = false;
 
@@ -23,6 +27,12 @@ let scale = 1;
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
+
+
+function updateZoomDisplay() {
+    const percent = Math.round(scale * 100);
+    zoomDisplay.textContent = "Zoom: " + percent + "%";
+}
 
 // ==========================
 // LOAD
@@ -113,6 +123,8 @@ function redraw(imageData = currentImageData) {
     tctx.putImageData(imageData, 0, 0);
 
     ctx.drawImage(temp, 0, 0);
+	
+	updateZoomDisplay();
 }
 
 // ==========================

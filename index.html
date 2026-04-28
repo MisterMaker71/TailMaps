@@ -53,6 +53,17 @@ canvas {
     background: black;
     image-rendering: pixelated;
 }
+
+#zoomDisplay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -83,6 +94,7 @@ canvas {
     </div>
 
     <div class="map-container">
+	<div id="zoomDisplay">Zoom: 100%</div>
         <canvas id="canvas"></canvas>
     </div>
 
