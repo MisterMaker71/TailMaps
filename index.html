@@ -9,35 +9,37 @@
     color: white;
     font-family: Arial;
     margin: 0;
-}
-
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-/* left side */
-.controls {
-    width: 250px;
-    padding: 10px;
-    overflow-y: auto;
-    border-right: 1px solid #444;
-}
-
-/* buttons look nicer stacked */
-.controls button {
-    display: block;
-    width: 100%;
-    margin-bottom: 8px;
-    padding: 10px;
-    cursor: pointer;
-}
-
-/* right side */
-canvas {
-    flex: 1;
-    background: black;
-}
+	}
+	
+	.container {
+		display: flex;
+		height: 100vh;
+	}
+	
+	/* left side */
+	.controls {
+		width: 250px;
+		padding: 10px;
+		overflow-y: auto;
+		border-right: 1px solid #444;
+	}
+	
+	/* buttons look nicer stacked */
+	.controls button {
+		display: block;
+		width: 100%;
+		margin-bottom: 8px;
+		padding: 10px;
+		cursor: pointer;
+	}
+	
+	/* right side */
+	canvas {
+		background: gray;
+		object-fit: contain;
+		max-width: 100%;
+		max-height: 100%;
+	}
 </style>
 </head>
 <body>
