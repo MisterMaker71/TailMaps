@@ -1,6 +1,8 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+ctx.imageSmoothingEnabled = false;
+
 
 const mapImg = new Image();
 const overlayImg = new Image();
@@ -25,12 +27,32 @@ let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 
+
+function fitToScreen() {
+    const container = canvas.parentElement;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    const scaleX = containerWidth / canvas.width;
+    const scaleY = containerHeight / canvas.height;
+
+    // pick smaller → keep aspect ratio
+    scale = Math.min(scaleX, scaleY);
+
+    // center it
+    offsetX = (containerWidth - canvas.width * scale) / 2;
+    offsetY = (containerHeight - canvas.height * scale) / 2;
+
+    redraw();
+}
+
+
 // load images
 Promise.all([
     new Promise(res => mapImg.onload = res),
     new Promise(res => overlayImg.onload = res)
 ]).then(() => {
-
     canvas.width = mapImg.width;
     canvas.height = mapImg.height;
 
@@ -50,6 +72,12 @@ Promise.all([
     overlayData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
 
     redraw();
+	
+	fitToScreen();
+});
+
+window.addEventListener("resize", () => {
+    fitToScreen();
 });
 
 // redraw
