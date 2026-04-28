@@ -1,11 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-
-const zoomDisplay = document.getElementById("zoomDisplay");
-
-
-// disable blur
 ctx.imageSmoothingEnabled = false;
 
 // images
@@ -21,18 +16,19 @@ let mapData, overlayData, currentImageData;
 // camera
 let offsetX = 0;
 let offsetY = 0;
-let scale = 1.5;
+let scale = 1;
 
-// drag
+// dragging
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 
+// layers
+let activeColors = [];
+let activeButtons = new Map();
 
-function updateZoomDisplay() {
-    const percent = Math.round(scale * 100);
-    zoomDisplay.textContent = "Zoom: " + percent + "%";
-}
+let pathEnabled = false;
+const pathColor = [254, 254, 254];
 
 // ==========================
 // LOAD
@@ -45,26 +41,26 @@ Promise.all([
 
     resizeCanvas();
 
-    // prepare map
-    const temp = document.createElement("canvas");
-    const tctx = temp.getContext("2d");
+    // map
+    const t1 = document.createElement("canvas");
+    const c1 = t1.getContext("2d");
 
-    temp.width = mapImg.width;
-    temp.height = mapImg.height;
+    t1.width = mapImg.width;
+    t1.height = mapImg.height;
 
-    tctx.drawImage(mapImg, 0, 0);
-    mapData = tctx.getImageData(0, 0, temp.width, temp.height);
+    c1.drawImage(mapImg, 0, 0);
+    mapData = c1.getImageData(0, 0, t1.width, t1.height);
     currentImageData = mapData;
 
-    // prepare overlay
-    const temp2 = document.createElement("canvas");
-    const tctx2 = temp2.getContext("2d");
+    // overlay
+    const t2 = document.createElement("canvas");
+    const c2 = t2.getContext("2d");
 
-    temp2.width = overlayImg.width;
-    temp2.height = overlayImg.height;
+    t2.width = overlayImg.width;
+    t2.height = overlayImg.height;
 
-    tctx2.drawImage(overlayImg, 0, 0);
-    overlayData = tctx2.getImageData(0, 0, temp2.width, temp2.height);
+    c2.drawImage(overlayImg, 0, 0);
+    overlayData = c2.getImageData(0, 0, t2.width, t2.height);
 
     fitToScreen();
 });
@@ -74,9 +70,7 @@ Promise.all([
 // ==========================
 
 function resizeCanvas() {
-    const container = canvas.parentElement;
-    const rect = container.getBoundingClientRect();
-
+    const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
 }
@@ -92,19 +86,17 @@ function fitToScreen() {
     const scaleX = viewW / mapImg.width;
     const scaleY = viewH / mapImg.height;
 
-    scale = Math.max(scaleX, scaleY);
+    scale = Math.min(scaleX, scaleY);
 
     offsetX = (viewW - mapImg.width * scale) / 2;
     offsetY = (viewH - mapImg.height * scale) / 2;
 
-    redraw();
+    redrawLayers();
 }
 
 // ==========================
 // DRAW
 // ==========================
-
-//const clamp = (val, min=1, max=10) => Math.min(Math.max(val, min), max)
 
 function redraw(imageData = currentImageData) {
     currentImageData = imageData;
@@ -114,9 +106,6 @@ function redraw(imageData = currentImageData) {
 
     ctx.imageSmoothingEnabled = false;
 
-	//offsetX = clamp(offsetX, -500 * scale, 500 * scale);
-	//offsetY = clamp(offsetY, -500 * scale, 500 * scale);
-	
     ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
     const temp = document.createElement("canvas");
@@ -126,17 +115,14 @@ function redraw(imageData = currentImageData) {
     temp.height = mapImg.height;
 
     tctx.putImageData(imageData, 0, 0);
-
     ctx.drawImage(temp, 0, 0);
-	
-	updateZoomDisplay();
 }
 
 // ==========================
-// HIGHLIGHT
+// LAYER SYSTEM
 // ==========================
 
-function highlightOverlay(target) {
+function redrawLayers() {
     const result = new Uint8ClampedArray(mapData.data);
 
     for (let i = 0; i < overlayData.data.length; i += 4) {
@@ -148,15 +134,66 @@ function highlightOverlay(target) {
 
         if (a === 0) continue;
 
-        if (matchColor(r, g, b, target)) {
+        // regions
+        for (const color of activeColors) {
+            if (matchColor(r, g, b, color)) {
+                result[i] = 255;
+                result[i + 1] = 0;
+                result[i + 2] = 0;
+            }
+        }
+
+        // path on top
+        if (pathEnabled && matchColor(r, g, b, pathColor)) {
             result[i] = 255;
-            result[i + 1] = 0;
-            result[i + 2] = 0;
+            result[i + 1] = 255;
+            result[i + 2] = 0; // yellow
         }
     }
 
     redraw(new ImageData(result, mapImg.width, mapImg.height));
 }
+
+// ==========================
+// TOGGLE REGION
+// ==========================
+
+function toggleColor(color, button) {
+
+    const index = activeColors.findIndex(c =>
+        c[0] === color[0] &&
+        c[1] === color[1] &&
+        c[2] === color[2]
+    );
+
+    if (index >= 0) {
+        activeColors.splice(index, 1);
+        activeButtons.delete(button);
+        button.style.background = "";
+    } else {
+        activeColors.push(color);
+        activeButtons.set(button, true);
+        button.style.background = "#550000";
+    }
+
+    redrawLayers();
+}
+
+// ==========================
+// TOGGLE PATH
+// ==========================
+
+function togglePath(button) {
+    pathEnabled = !pathEnabled;
+
+    button.style.background = pathEnabled ? "#555500" : "";
+
+    redrawLayers();
+}
+
+// ==========================
+// MATCH COLOR
+// ==========================
 
 function matchColor(r, g, b, t) {
     const tol = 5;
@@ -167,7 +204,16 @@ function matchColor(r, g, b, t) {
     );
 }
 
+// ==========================
+// RESET
+// ==========================
+
 function resetMap() {
+    activeColors = [];
+    pathEnabled = false;
+
+    document.querySelectorAll("button").forEach(b => b.style.background = "");
+
     redraw(mapData);
 }
 
