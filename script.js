@@ -114,8 +114,8 @@ function redraw(imageData = currentImageData) {
 
     ctx.imageSmoothingEnabled = false;
 
-	offsetX = clamp(offsetX, 100, 100);
-	offsetY = clamp(offsetY, 100, 100);
+	offsetX = clamp(offsetX, -500, 500);
+	offsetY = clamp(offsetY, -500, 500);
 	
     ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
