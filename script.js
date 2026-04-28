@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 ctx.imageSmoothingEnabled = false;
 
+console.log("script loaded!");
 
 const mapImg = new Image();
 const overlayImg = new Image();
@@ -45,6 +46,8 @@ function fitToScreen() {
     offsetY = (containerHeight - canvas.height * scale) / 2;
 
     redraw();
+	
+	console.log("fit to screen");
 }
 
 
@@ -70,8 +73,6 @@ Promise.all([
 
     tempCtx.drawImage(overlayImg, 0, 0);
     overlayData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-
-    redraw();
 	
 	fitToScreen();
 });
