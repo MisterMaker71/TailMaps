@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Map Highlighter</title>
+<style>
+    body {
+        background: #111;
+        color: white;
+        font-family: Arial;
+        text-align: center;
+    }
+
+    canvas {
+        border: 1px solid #444;
+        margin-top: 10px;
+    }
+
+    button {
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>Map Highlighter</h2>
+
+<div>
+    <button onclick="highlight([255,0,0])">Red Area</button>
+    <button onclick="highlight([0,255,0])">Green Area</button>
+    <button onclick="highlight([0,0,255])">Blue Area</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script src="script.js"></script>
+
+</body>
+</html>
