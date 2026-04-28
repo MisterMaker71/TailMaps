@@ -184,7 +184,7 @@ function toggleColor(color, button) {
         activeColors = [];
     } else {
         activeColors = [color];
-        button.style.background = "#550000";
+        button.style.background = "#bababa";
     }
 
     redrawLayers();
@@ -197,7 +197,7 @@ function toggleColor(color, button) {
 function togglePath(button) {
     pathEnabled = !pathEnabled;
 
-    button.style.background = pathEnabled ? "#555500" : "";
+    button.style.background = pathEnabled ? "#bababa" : "";
 
     redrawLayers();
 }
