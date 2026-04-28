@@ -160,19 +160,23 @@ function redrawLayers() {
 
 function toggleColor(color, button) {
 
-    const index = activeColors.findIndex(c =>
-        c[0] === color[0] &&
-        c[1] === color[1] &&
-        c[2] === color[2]
-    );
+    const isSameActive =
+        activeColors.length === 1 &&
+        activeColors[0][0] === color[0] &&
+        activeColors[0][1] === color[1] &&
+        activeColors[0][2] === color[2];
 
-    if (index >= 0) {
-        activeColors.splice(index, 1);
-        activeButtons.delete(button);
-        button.style.background = "";
+    // reset all buttons first
+    document.querySelectorAll(".controls button").forEach(b => {
+        b.style.background = "";
+    });
+
+    if (isSameActive) {
+        // turn OFF
+        activeColors = [];
     } else {
-        activeColors.push(color);
-        activeButtons.set(button, true);
+        // turn ON only this one
+        activeColors = [color];
         button.style.background = "#550000";
     }
 
@@ -212,7 +216,9 @@ function resetMap() {
     activeColors = [];
     pathEnabled = false;
 
-    document.querySelectorAll("button").forEach(b => b.style.background = "");
+    document.querySelectorAll(".controls button").forEach(b => {
+        b.style.background = "";
+    });
 
     redraw(mapData);
 }
