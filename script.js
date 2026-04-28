@@ -104,7 +104,7 @@ function fitToScreen() {
 // DRAW
 // ==========================
 
-const clamp = (val, min=1, max=10) => Math.min(Math.max(val, min), max)
+//const clamp = (val, min=1, max=10) => Math.min(Math.max(val, min), max)
 
 function redraw(imageData = currentImageData) {
     currentImageData = imageData;
@@ -114,8 +114,8 @@ function redraw(imageData = currentImageData) {
 
     ctx.imageSmoothingEnabled = false;
 
-	offsetX = clamp(offsetX, -500 * scale, 500 * scale);
-	offsetY = clamp(offsetY, -500 * scale, 500 * scale);
+	//offsetX = clamp(offsetX, -500 * scale, 500 * scale);
+	//offsetY = clamp(offsetY, -500 * scale, 500 * scale);
 	
     ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
