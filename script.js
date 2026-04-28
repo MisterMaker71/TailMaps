@@ -21,7 +21,7 @@ let mapData, overlayData, currentImageData;
 // camera
 let offsetX = 0;
 let offsetY = 0;
-let scale = 1;
+let scale = 1.5;
 
 // drag
 let isDragging = false;
@@ -92,7 +92,7 @@ function fitToScreen() {
     const scaleX = viewW / mapImg.width;
     const scaleY = viewH / mapImg.height;
 
-    scale = Math.min(scaleX, scaleY);
+    scale = Math.max(scaleX, scaleY);
 
     offsetX = (viewW - mapImg.width * scale) / 2;
     offsetY = (viewH - mapImg.height * scale) / 2;
@@ -104,6 +104,8 @@ function fitToScreen() {
 // DRAW
 // ==========================
 
+const clamp = (val, min=1, max=10) => Math.min(Math.max(val, min), max)
+
 function redraw(imageData = currentImageData) {
     currentImageData = imageData;
 
@@ -112,6 +114,9 @@ function redraw(imageData = currentImageData) {
 
     ctx.imageSmoothingEnabled = false;
 
+	offsetX = clamp(offsetX, 100, 100);
+	offsetY = clamp(offsetY, 100, 100);
+	
     ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
     const temp = document.createElement("canvas");
