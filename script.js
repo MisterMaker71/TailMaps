@@ -271,7 +271,7 @@ canvas.addEventListener("wheel", e => {
 
     scale *= (e.deltaY < 0) ? zoom : 1 / zoom;
 
-    scale = Math.max(0.2, Math.min(scale, 10));
+    scale = Math.max(0.2, Math.max(scale, 10));
 
     offsetX = mx - wx * scale;
     offsetY = my - wy * scale;
