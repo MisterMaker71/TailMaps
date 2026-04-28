@@ -1,7 +1,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// images
+
 const mapImg = new Image();
 const overlayImg = new Image();
 
@@ -11,12 +11,12 @@ overlayImg.crossOrigin = "anonymous";
 mapImg.src = "map.png";
 overlayImg.src = "overlay.png";
 
-// data
+
 let mapData;
 let overlayData;
 let currentImageData;
 
-// camera
+
 let offsetX = 0;
 let offsetY = 0;
 let scale = 1;
@@ -34,12 +34,12 @@ Promise.all([
     canvas.width = mapImg.width;
     canvas.height = mapImg.height;
 
-    // draw map
+    // draw
     ctx.drawImage(mapImg, 0, 0);
     mapData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     currentImageData = mapData;
 
-    // overlay → hidden canvas
+
     const tempCanvas = document.createElement("canvas");
     const tempCtx = tempCanvas.getContext("2d");
 
@@ -52,7 +52,7 @@ Promise.all([
     redraw();
 });
 
-// redraw with camera
+// redraw
 function redraw(imageData = currentImageData) {
     currentImageData = imageData;
 
@@ -72,7 +72,7 @@ function redraw(imageData = currentImageData) {
     ctx.drawImage(tempCanvas, 0, 0);
 }
 
-// highlight using overlay
+// highlight
 function highlightOverlay(targetColor) {
     if (!mapData || !overlayData) return;
 
@@ -98,7 +98,7 @@ function highlightOverlay(targetColor) {
     redraw(newImage);
 }
 
-// color match
+// color test
 function matchColor(r, g, b, target) {
     const tolerance = 5;
 
@@ -114,9 +114,7 @@ function resetMap() {
     redraw(mapData);
 }
 
-// ==========================
-// 🖱️ PAN (drag)
-// ==========================
+// drag
 
 canvas.addEventListener("mousedown", (e) => {
     isDragging = true;
@@ -143,9 +141,7 @@ window.addEventListener("mousemove", (e) => {
     redraw();
 });
 
-// ==========================
-// 🔍 ZOOM (scroll)
-// ==========================
+// scroll
 
 canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
