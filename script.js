@@ -1,117 +1,125 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// disable blur
 ctx.imageSmoothingEnabled = false;
 
-console.log("script loaded!");
-
+// images
 const mapImg = new Image();
 const overlayImg = new Image();
-
-mapImg.crossOrigin = "anonymous";
-overlayImg.crossOrigin = "anonymous";
 
 mapImg.src = "map.png";
 overlayImg.src = "overlay.png";
 
+// data
+let mapData, overlayData, currentImageData;
 
-let mapData;
-let overlayData;
-let currentImageData;
-
-
+// camera
 let offsetX = 0;
 let offsetY = 0;
 let scale = 1;
 
+// drag
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 
+// ==========================
+// LOAD
+// ==========================
 
-function fitToScreen() {function fitToScreen() {
-    const viewWidth = canvas.width;
-    const viewHeight = canvas.height;
-
-    const scaleX = viewWidth / mapImg.width;
-    const scaleY = viewHeight / mapImg.height;
-
-    scale = Math.min(scaleX, scaleY);
-
-    offsetX = (viewWidth - mapImg.width * scale) / 2;
-    offsetY = (viewHeight - mapImg.height * scale) / 2;
-
-    redraw();
-	
-	console.log("fit to screen");
-}
-
-function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    redraw();
-}
-
-
-// load images
 Promise.all([
     new Promise(res => mapImg.onload = res),
     new Promise(res => overlayImg.onload = res)
 ]).then(() => {
-    canvas.width = mapImg.width;
-    canvas.height = mapImg.height;
 
-    // draw
-    ctx.drawImage(mapImg, 0, 0);
-    mapData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    resizeCanvas();
+
+    // prepare map
+    const temp = document.createElement("canvas");
+    const tctx = temp.getContext("2d");
+
+    temp.width = mapImg.width;
+    temp.height = mapImg.height;
+
+    tctx.drawImage(mapImg, 0, 0);
+    mapData = tctx.getImageData(0, 0, temp.width, temp.height);
     currentImageData = mapData;
 
+    // prepare overlay
+    const temp2 = document.createElement("canvas");
+    const tctx2 = temp2.getContext("2d");
 
-    const tempCanvas = document.createElement("canvas");
-    const tempCtx = tempCanvas.getContext("2d");
+    temp2.width = overlayImg.width;
+    temp2.height = overlayImg.height;
 
-    tempCanvas.width = overlayImg.width;
-    tempCanvas.height = overlayImg.height;
+    tctx2.drawImage(overlayImg, 0, 0);
+    overlayData = tctx2.getImageData(0, 0, temp2.width, temp2.height);
 
-    tempCtx.drawImage(overlayImg, 0, 0);
-    overlayData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-	
-	resizeCanvas();
-	fitToScreen();
+    fitToScreen();
 });
 
-window.addEventListener("resize", () => {
-    resizeCanvas();
-	fitToScreen();
-});
+// ==========================
+// CANVAS SIZE
+// ==========================
 
-// redraw
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+}
+
+// ==========================
+// FIT
+// ==========================
+
+function fitToScreen() {
+    const viewW = canvas.width;
+    const viewH = canvas.height;
+
+    const scaleX = viewW / mapImg.width;
+    const scaleY = viewH / mapImg.height;
+
+    scale = Math.min(scaleX, scaleY);
+
+    offsetX = (viewW - mapImg.width * scale) / 2;
+    offsetY = (viewH - mapImg.height * scale) / 2;
+
+    redraw();
+}
+
+// ==========================
+// DRAW
+// ==========================
+
 function redraw(imageData = currentImageData) {
     currentImageData = imageData;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.imageSmoothingEnabled = false;
+
     ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
-    const tempCanvas = document.createElement("canvas");
-    const tempCtx = tempCanvas.getContext("2d");
+    const temp = document.createElement("canvas");
+    const tctx = temp.getContext("2d");
 
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
+    temp.width = mapImg.width;
+    temp.height = mapImg.height;
 
-    tempCtx.putImageData(imageData, 0, 0);
+    tctx.putImageData(imageData, 0, 0);
 
-    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.drawImage(temp, 0, 0);
 }
 
-// highlight
-function highlightOverlay(targetColor) {
-    if (!mapData || !overlayData) return;
+// ==========================
+// HIGHLIGHT
+// ==========================
 
+function highlightOverlay(target) {
     const result = new Uint8ClampedArray(mapData.data);
 
     for (let i = 0; i < overlayData.data.length; i += 4) {
@@ -123,53 +131,46 @@ function highlightOverlay(targetColor) {
 
         if (a === 0) continue;
 
-        if (matchColor(r, g, b, targetColor)) {
+        if (matchColor(r, g, b, target)) {
             result[i] = 255;
             result[i + 1] = 0;
             result[i + 2] = 0;
         }
     }
 
-    const newImage = new ImageData(result, canvas.width, canvas.height);
-    redraw(newImage);
+    redraw(new ImageData(result, mapImg.width, mapImg.height));
 }
 
-// color test
-function matchColor(r, g, b, target) {
-    const tolerance = 5;
-
+function matchColor(r, g, b, t) {
+    const tol = 5;
     return (
-        Math.abs(r - target[0]) <= tolerance &&
-        Math.abs(g - target[1]) <= tolerance &&
-        Math.abs(b - target[2]) <= tolerance
+        Math.abs(r - t[0]) <= tol &&
+        Math.abs(g - t[1]) <= tol &&
+        Math.abs(b - t[2]) <= tol
     );
 }
 
-// reset
 function resetMap() {
     redraw(mapData);
 }
 
-// drag
+// ==========================
+// PAN
+// ==========================
 
-canvas.addEventListener("mousedown", (e) => {
+canvas.addEventListener("mousedown", e => {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
 });
 
-window.addEventListener("mouseup", () => {
-    isDragging = false;
-});
+window.addEventListener("mouseup", () => isDragging = false);
 
-window.addEventListener("mousemove", (e) => {
+window.addEventListener("mousemove", e => {
     if (!isDragging) return;
 
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
-
-    offsetX += dx;
-    offsetY += dy;
+    offsetX += e.clientX - lastX;
+    offsetY += e.clientY - lastY;
 
     lastX = e.clientX;
     lastY = e.clientY;
@@ -177,30 +178,36 @@ window.addEventListener("mousemove", (e) => {
     redraw();
 });
 
-// scroll
+// ==========================
+// ZOOM
+// ==========================
 
-canvas.addEventListener("wheel", (e) => {
+canvas.addEventListener("wheel", e => {
     e.preventDefault();
 
-    const zoomFactor = 1.1;
+    const zoom = 1.1;
 
-    const mouseX = e.offsetX;
-    const mouseY = e.offsetY;
+    const mx = e.offsetX;
+    const my = e.offsetY;
 
-    const worldX = (mouseX - offsetX) / scale;
-    const worldY = (mouseY - offsetY) / scale;
+    const wx = (mx - offsetX) / scale;
+    const wy = (my - offsetY) / scale;
 
-    if (e.deltaY < 0) {
-        scale *= zoomFactor;
-    } else {
-        scale /= zoomFactor;
-    }
+    scale *= (e.deltaY < 0) ? zoom : 1 / zoom;
 
-    // clamp zoom
     scale = Math.max(0.2, Math.min(scale, 10));
 
-    offsetX = mouseX - worldX * scale;
-    offsetY = mouseY - worldY * scale;
+    offsetX = mx - wx * scale;
+    offsetY = my - wy * scale;
 
     redraw();
+});
+
+// ==========================
+// RESIZE
+// ==========================
+
+window.addEventListener("resize", () => {
+    resizeCanvas();
+    fitToScreen();
 });
