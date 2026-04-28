@@ -5,52 +5,73 @@
 <title>Map Highlighter</title>
 <style>
     body {
-        background: #111;
-        color: white;
-        font-family: Arial;
-        text-align: center;
-    }
+    background: #111;
+    color: white;
+    font-family: Arial;
+    margin: 0;
+}
 
-    canvas {
-        border: 1px solid #444;
-        margin-top: 10px;
-    }
+.container {
+    display: flex;
+    height: 100vh;
+}
 
-    button {
-        margin: 5px;
-        padding: 10px;
-        cursor: pointer;
-    }
+/* left side */
+.controls {
+    width: 250px;
+    padding: 10px;
+    overflow-y: auto;
+    border-right: 1px solid #444;
+}
+
+/* buttons look nicer stacked */
+.controls button {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* right side */
+canvas {
+    flex: 1;
+    background: black;
+}
 </style>
 </head>
 <body>
 
 <h2>Map Highlighter</h2>
 
-<div>
-	<button onclick="highlightOverlay([255,0,0])">MisterMaker_71</button>
-	<button onclick="highlightOverlay([61,147,134])">Okay Donuts +<br/>Tiny Pawb</button>
-	<button onclick="highlightOverlay([0,255,117])">???</button>
-	<button onclick="highlightOverlay([158,205,118])">Sneb</button>
-	<br/>
-	<button onclick="highlightOverlay([255,255,0])">Windyote +<br/>Marty</button>
-	<button onclick="highlightOverlay([63,182,122])">MagnuWah</button>
-	<button onclick="highlightOverlay([0,27,255])">Tbear</button>
-	<button onclick="highlightOverlay([239,0,255])">DVal</button>
-	<br/>
-	<button onclick="highlightOverlay([16,255,0])">fzysqrl</button>
-	<button onclick="highlightOverlay([255,69,0])">Jax</button>
-	<button onclick="highlightOverlay([78,51,197])">Malachi Derg</button>
-	<button onclick="highlightOverlay([0,0,0])">Zinakiko</button>
-	<br/>
-	<button onclick="highlightOverlay([134,63,200])">a Muffin</button>
-	<button onclick="highlightOverlay([63,200,120])">Tiger</button>
-	<button onclick="highlightOverlay([68,148,128])">DroxianV</button>
-	<br/>
-	<button onclick="resetMap()">Reset</button>
-</div>
+<div class="container">
+    
+    <div class="controls">
+        <button onclick="highlightOverlay([255,0,0])">MisterMaker_71</button>
+        <button onclick="highlightOverlay([61,147,134])">Okay Donuts +<br/>Tiny Pawb</button>
+        <button onclick="highlightOverlay([0,255,117])">???</button>
+        <button onclick="highlightOverlay([158,205,118])">Sneb</button>
+        <br/>
+        <button onclick="highlightOverlay([255,255,0])">Windyote +<br/>Marty</button>
+        <button onclick="highlightOverlay([63,182,122])">MagnuWah</button>
+        <button onclick="highlightOverlay([0,27,255])">Tbear</button>
+        <button onclick="highlightOverlay([239,0,255])">DVal</button>
+        <br/>
+        <button onclick="highlightOverlay([16,255,0])">fzysqrl</button>
+        <button onclick="highlightOverlay([255,69,0])">Jax</button>
+        <button onclick="highlightOverlay([78,51,197])">Malachi Derg</button>
+        <button onclick="highlightOverlay([0,0,0])">Zinakiko</button>
+        <br/>
+        <button onclick="highlightOverlay([134,63,200])">a Muffin</button>
+        <button onclick="highlightOverlay([63,200,120])">Tiger</button>
+        <button onclick="highlightOverlay([68,148,128])">DroxianV</button>
+        <br/>
+        <button onclick="resetMap()">Reset</button>
+    </div>
 
-<canvas id="canvas"></canvas>
+    <canvas id="canvas"></canvas>
+
+</div>
 
 <script src="script.js"></script>
 
