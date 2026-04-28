@@ -214,13 +214,15 @@ function matchColor(r, g, b, t) {
 
 function resetMap() {
     activeColors = [];
-    pathEnabled = false;
 
+    // reset ONLY region buttons (not the path button)
     document.querySelectorAll(".controls button").forEach(b => {
-        b.style.background = "";
+        if (!b.classList.contains("path-btn")) {
+            b.style.background = "";
+        }
     });
 
-    redraw(mapData);
+    redrawLayers(); // keep path state
 }
 
 // ==========================
