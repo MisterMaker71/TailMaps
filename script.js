@@ -93,7 +93,7 @@ function fitToScreen() {
     const scaleX = viewW / mapImg.width;
     const scaleY = viewH / mapImg.height;
 
-    scale = Math.min(scaleX, scaleY);
+    scale = Math.max(scaleX, scaleY);
 
     offsetX = (viewW - mapImg.width * scale) / 2;
     offsetY = (viewH - mapImg.height * scale) / 2;
@@ -271,7 +271,7 @@ canvas.addEventListener("wheel", e => {
 
     scale *= (e.deltaY < 0) ? zoom : 1 / zoom;
 
-    scale = Math.max(0.2, Math.max(scale, 10));
+    scale = Math.max(0.2, Math.min(scale, 10));
 
     offsetX = mx - wx * scale;
     offsetY = my - wy * scale;
